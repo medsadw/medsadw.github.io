@@ -1,0 +1,9 @@
+node_modules
+.idea
+.travis.xml
+.DS_Store
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+_site
+something
