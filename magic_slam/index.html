@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="MAGiC-SLAM: Multi-Agent Gaussian Globally Consistent SLAM.">
+  <meta name="keywords" content="Gaussian-SLAM, Gaussian-splatting, SLAM, Gaussian">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MAGiC-SLAM</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/magic-wand.png">
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">MAGiC-SLAM: Multi-Agent Gaussian Globally Consistent SLAM</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://vladimiryugay.github.io/">Vladimir Yugay</a>,</span>
+            <span class="author-block">
+              <a href="https://staff.fnwi.uva.nl/th.gevers/">Theo Gevers</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://oswaldm.github.io/">Martin R. Oswald</a>,
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">University of Amsterdam</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <!-- <span class="link-block">
+                <a href="https://ivi.fnwi.uva.nl/cv/paper/GaussianSLAM.pdf"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span> -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2411.16785"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>                                   
+              <!-- Video Link. -->
+              <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=e0WjMK72LEg"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span>
+
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/VladimirYugay/MAGiC-SLAM"
+                   class="external-link button is-normal is-rounded is-light">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <video id="teaser" autoplay muted loop playsinline height="100%">
+        <source src="./static/videos/magic_slam_demo.mp4"
+                type="video/mp4">
+      </video>
+      <h2 class="subtitle has-text-centered">
+        <span class="dnerf">MAGiC-SLAM</span> can reconstruct a renderable 3D scene from RGBD streams of multiple simultaneously operating agents.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Simultaneous localization and mapping (SLAM) systems with novel view synthesis capabilities are widely used
+            in computer vision, with applications in augmented reality, robotics, and autonomous driving. However, existing
+            approaches are limited to single-agent operation. Recent work has addressed this problem using a distributed neural
+            scene representation. Unfortunately, existing methods are slow, cannot accurately render real-world data, are restricted
+            to two agents, and have limited tracking accuracy.
+          </p>
+          <p>
+            In contrast, we propose a rigidly deformable 3D Gaussian-based scene representation that dramatically speeds up the system.
+            However, improving tracking accuracy and reconstructing a consistent map from multiple agents remains
+            challenging due to trajectory drift and discrepancies across agents' observations. Therefore, we propose new
+            tracking and map-merging mechanisms and integrate loop closure in the Gaussian-based SLAM pipeline.
+            We evaluate <span class="dnerf">MAGiC-SLAM</span> on synthetic and real-world datasets and find it
+            more accurate and faster than the state of the art.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section m-0 p-0">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Method Overview</h2>
+    
+        <div class="column pt-0">
+          <figure class="image is-full-width">
+            <img src="./static/images/architecture.png"/>
+          </figure>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            <strong>MAGiC-SLAM Architecture.</strong> <em>Agent Side:</em> Each agent processes a separate RGBD stream, maintaining a local sub-map and estimating
+            its trajectory. When an agent starts a new sub-map, it sends the previous sub-map and image features
+            to the centralized server. <em>Server Side:</em> The server stores the image features and sub-maps
+            from all agents and performs loop closure detection, loop constraint estimation, and pose graph optimization.
+            It then updates the stored sub-maps and returns the optimized poses to the agents.
+            Once the algorithm completes (denoted by green arrows), the server merges the accumulated sub-maps
+            into a single unified map and refines it.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <!-- Animation. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Rendering Results</h2>
+
+        <!-- Re-rendering. -->
+        <h3 class="title is-4">Comparison with the recent multiagent NVS-SLAM method</h3>
+        <div class="content has-text-justified is-centered">
+          <p>
+            We compare our method with other recent pipelines through side-by-side rendering of 
+            <i>desk_1</i> scene from <i>TUM-RGBD</i> dataset.
+          </p>
+        </div>           
+
+        <div class="content has-text-centered is-centered">
+          <video id="replay-video"
+                 controls
+                 muted
+                 preload
+                 playsinline
+                 width="100%">
+            <source src="./static/videos/comparisons/apt_1_crop.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <br>
+        <div class="content has-text-centered is-centered">
+          <video id="replay-video"
+                 controls
+                 muted
+                 preload
+                 playsinline
+                 width="100%">
+            <source src="./static/videos/comparisons/apt_0_crop.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <br>
+        <div class="content has-text-centered is-centered">
+          <video id="replay-video"
+                 controls
+                 muted
+                 preload
+                 playsinline
+                 width="100%">
+            <source src="./static/videos/comparisons/apt_2_crop.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <br>
+        <div class="content has-text-centered is-centered">
+          <video id="replay-video"
+                 controls
+                 muted
+                 preload
+                 playsinline
+                 width="100%">
+            <source src="./static/videos/comparisons/off_0_crop.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h2 class="title is-3">Novel View Synthesis</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            <span class="dnerf">MaGIC-SLAM</span> effectively merges maps from multiple agents to enable novel view synthesis.
+            Thanks to Gaussian Splatting, these scenes can be rendered in real-time.
+          </p>
+        </div>        
+
+        <video id="teaser" autoplay muted loop playsinline height="100%">
+          <source src="./static/videos/magic_slam_nvs.mp4" type="video/mp4">
+        </video>        
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{yugay2024magicslammultiagentgaussianglobally,
+      title={MAGiC-SLAM: Multi-Agent Gaussian Globally Consistent SLAM}, 
+      author={Vladimir Yugay and Theo Gevers and Martin R. Oswald},
+      year={2024},
+      eprint={2411.16785},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2411.16785}, 
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-4">
+        <div class="content">
+          <p>
+            The website is based on <a href="https://github.com/nerfies/nerfies.github.io">this source code</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
