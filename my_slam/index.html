@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Gaussian-SLAM: Photo-realistic Dense SLAM with Gaussian Splatting.">
+  <meta name="keywords" content="Gaussian-SLAM, Gaussian-splatting, SLAM, Gaussian">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gaussian-SLAM: Photo-realistic Dense SLAM with Gaussian Splatting</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.ico">
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body>
+
+
+<!-- <nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="../../index.html">
+      <img src="./static/home.png" alt="Home">
+    </a>
+  </div>
+</nav> -->
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Gaussian-SLAM: Photo-realistic Dense SLAM with Gaussian Splatting</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://vladimiryugay.github.io/">Vladimir Yugay</a>,</span>
+            <span class="author-block">
+              <a href="https://unique1i.github.io/">Yue Li</a>,</span>
+            <span class="author-block">
+              <a href="https://staff.fnwi.uva.nl/th.gevers/">Theo Gevers</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://oswaldm.github.io/">Martin R. Oswald</a>,
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">University of Amsterdam</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">06.12.2023</span>
+          </div>          
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <!-- <span class="link-block">
+                <a href="https://ivi.fnwi.uva.nl/cv/paper/GaussianSLAM.pdf"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span> -->
+              <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=RZK1o_ija7M"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span>                            
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2312.10070"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Video Link. -->
+              <!-- <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span> -->
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/VladimirYugay/Gaussian-SLAM"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <video id="teaser" autoplay muted loop playsinline height="100%">
+        <source src="./static/videos/gslam_demo.mp4"
+                type="video/mp4">
+      </video>
+      <h2 class="subtitle has-text-centered">
+        <span class="dnerf">Gaussian-SLAM</span> can reconstruct a renderable 3D scene from a RGBD stream.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            We present the first neural RGBD SLAM method capable of photorealistically reconstructing real-world
+            scenes.
+          </p>
+          <p>
+            Despite modern SLAM methods achieving impressive results on synthetic datasets, they still struggle with real-world
+            datasets. Our approach utilizes 3D Gaussians as a primary unit for our scene representation to overcome the limitations
+            of the previous methods. We observe that classical 3D Gaussians are hard to use in a monocular setup: they can't encode
+            accurate geometry and are hard to optimize with single-view sequential supervision. By extending classical 3D Gaussians
+            to encode geometry, and designing a novel scene representation and the means to grow, and optimize it, we propose a
+            SLAM system capable of reconstructing and rendering real-world datasets without compromising on speed and efficiency.
+          </p>
+          <p>
+            We show that <span class="dnerf">Gaussian-SLAM</span> can reconstruct and photorealistically render real-world scenes.
+            We evaluate our method on common synthetic and real-world datasets and compare it against other state-of-the-art SLAM
+            methods. Finally, we demonstrate, that the final 3D scene representation that we obtain can be rendered in Real-time
+            thanks to the efficient Gaussian Splatting rendering.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section m-0 p-0">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Method Overview</h2>
+    
+        <div class="column pt-0">
+          <figure class="image is-full-width">
+            <img src="./static/images/architecture.png"/>
+          </figure>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            Upon receiving an input posed RGBD keyframe, it is subsampled, taking into account the color gradient. The sampled points are then projected into 3D space, where new Gaussians are initialized with their means at these sampled locations. ​
+            These new 3D Gaussians are added to the currently active segment of the global map within the sparse regions. 
+            The input RGBD keyframe is temporarily stored alongside other keyframes that have contributed to the active sub-map. 
+            Once the new Gaussians have been integrated into the active sub-map, all keyframes contributing to the active sub-map are rendered.
+            Subsequently, the depth and color losses are computed w.r.t. to the sub-map input keyframes.
+            Following this, we update the parameters of the 3D Gaussians in the active sub-map.
+            This process is repeated for a fixed number of iterations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <!-- Animation. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Rendering Results</h2>
+
+        <!-- Re-rendering. -->
+        <h3 class="title is-4">Comparison with recent neural SLAM methods</h3>
+        <div class="content has-text-justified is-centered">
+          <p>
+            We compare our method with other recent pipelines through side-by-side rendering of 
+            <i>desk_1</i> scene from <i>TUM-RGBD</i> dataset.
+          </p>
+        </div>           
+
+        <div class="content has-text-centered is-centered">
+          <video id="replay-video"
+                 controls
+                 muted
+                 preload
+                 playsinline
+                 width="100%">
+            <source src="./static/videos/gslam_comparison.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <br>
+
+        <div class="content has-text-justified">
+          <p>
+            We also compare <span class="dnerf">Gaussian-SLAM</span> on more scenes from <i>TUM-RGBD</i> and <i>ScanNet</i>.
+            <br>
+            <i>Note. We couldn't obtain scene renders from GO-SLAM.</i>
+          </p>
+        </div>
+
+        <div class="columns is-multiline is-variable is-1">
+          <div class="column is-one-fifth pt-0">
+            <p>NICE-SLAM</p>            
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_0_niceslam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>ESLAM</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_0_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Point-SLAM</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_0_ptslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Gaussian-SLAM (ours)</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_0_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Ground-truth</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_0_gt.png"/>
+            </figure>
+          </div>
+          <!-- Second Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_207_niceslam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_207_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_207_ptslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_207_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/scannet_207_gt.png"/>
+            </figure>
+          </div>
+           <!-- Third Row -->           
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_desk_niceslam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_desk_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_desk_ptslam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_desk_ours.png"/>
+            </figure>               
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_desk_gt.png"/>
+            </figure>                           
+          </div>
+           <!-- Fourth Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_office_niceslam.png"/>
+            </figure>                           
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_office_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_office_ptslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_office_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/tum_office_gt.png"/>
+            </figure>            
+          </div>
+          <!-- Fifth Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/nice-slam_2e74812d00_00020.jpg"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/eslam_2e74812d00_00020.jpg"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/point-slam_2e74812d00_0020.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/gslam_2e74812d00_0020.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/gt_2e74812d00_0020.png"/>
+            </figure>            
+          </div>     
+
+          <!-- Sixth Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/nice-slam_fb05e13ad1_0020.jpg"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/eslam_fb05e13ad1_0020.jpg"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/point-slam_fb05e13ad1_0020.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/gslam_fb05e13ad1_0020.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/real_world_rendering/gt_fb05e13ad1_0020.png"/>
+            </figure>            
+          </div>                                                  
+                                              
+        </div>   
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h2 class="title is-3">Reconstruction Results</h2>
+
+        <h3 class="title is-4">Reconstruction of real-world scenes</h3>
+        <div class="content has-text-justified">
+          <p>
+            Here we show the renders of the reconstructed meshes on TUM-RGBD and ScanNet.
+            While <span class="dnerf">Gaussian-SLAM</span> outperforms all other recent methods in rendering,
+            it achieves on-par reconstruction results with state-of-the-art approaches. <br>
+            <i>Note. We couldn't obtain a mesh on a real-word dataset from GO-SLAM.</i>
+          </p>
+        </div>  
+        
+        
+        <div class="columns is-multiline is-variable is-1">
+          <div class="column is-one-fifth pt-0">
+            <p>NICE-SLAM</p>            
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/59_nice_slam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>ESLAM</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/59_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Point-SLAM</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/59_point_slam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Gaussian-SLAM (ours)</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/59_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Ground-truth</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/59_gt.png"/>
+            </figure>
+          </div>
+          <!-- Second Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/169_nice.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/169_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/169_point.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/169_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/169_gt.png"/>
+            </figure>
+          </div>
+           <!-- Third Row -->           
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/desk_nice.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/desk_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/desk_point.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/desk_ours.png"/>
+            </figure>               
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/desk_gt.png"/>
+            </figure>                           
+          </div>
+           <!-- Fourth Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office_nice.png"/>
+            </figure>                           
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office_eslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office_point.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office_gt.png"/>
+            </figure>            
+          </div>                
+        </div>   
+
+        <h3 class="title is-4">Reconstruction of synthetic scenes</h3>
+        <div class="content has-text-justified">
+          <p>
+            Here we show renders of the meshes on Replica synthetic dataset.
+            <span class="dnerf">Gaussian-SLAM</span> performs on par with state-of-the-art methods in reconstruction on synthetic scenes as well.
+          </p>
+        </div>    
+        
+        <div class="columns is-multiline is-variable is-1">
+          <div class="column is-one-fifth pt-0">
+            <p>ESLAM</p>            
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room0_eslam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>GO-SLAM</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room0_go-slam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Point-SLAM</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room0_point-slam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Gaussian-SLAM (ours)</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room0_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth pt-0">
+            <p>Ground-truth</p>
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room0_gt.png"/>
+            </figure>
+          </div>
+          <!-- Second Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room1_eslam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room1_go-slam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room1_point-slam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room1_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/room1_gt.png"/>
+            </figure>
+          </div>
+           <!-- Third Row -->           
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office0_eslam.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office0_goslam.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office0_point.png"/>
+            </figure>            
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office0_ours.png"/>
+            </figure>               
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office0_gt.png"/>
+            </figure>                           
+          </div>
+           <!-- Fourth Row -->
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office4_eslam.png"/>
+            </figure>                           
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office4_go.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office4_point.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office4_ours.png"/>
+            </figure>
+          </div>
+          <div class="column is-one-fifth m-0 pt-0">
+            <figure class="image is-4by3">
+              <img src="./static/images/mesh_comparison/office4_gt.png"/>
+            </figure>            
+          </div>                
+        </div>           
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h2 class="title is-3">Real-time Rendering</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Scenes reconstructed with <span class="dnerf">Gaussian-SLAM</span> can be rendered in real-time, thanks to 
+            efficient Gaussian Splatting rendering.
+          </p>
+        </div>        
+
+        <video id="teaser" autoplay muted loop playsinline height="100%">
+          <source src="./static/videos/realtime_rendering.mp4" type="video/mp4">
+        </video>        
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{yugay2023gaussianslam,
+      title={Gaussian-SLAM: Photo-realistic Dense SLAM with Gaussian Splatting}, 
+      author={Vladimir Yugay and Yue Li and Theo Gevers and Martin R. Oswald},
+      year={2023},
+      eprint={2312.10070},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-4">
+        <div class="content">
+          <p>
+            The website is based on <a href="https://github.com/nerfies/nerfies.github.io">this source code</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
